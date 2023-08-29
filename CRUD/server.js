@@ -7,8 +7,9 @@ const express = require('express');
 const cors = require('cors');
 const connect = require('./config/connect');
 const notesController = require('./controller/notesController');
-
-
+const userController = require('./controller/userController');
+const cookieParser = require('cookie-parser');
+const requireAuth = require('./middleware/requireAuth');
 
 //connect to db 
 connect();
@@ -19,13 +20,17 @@ const app = express();
 
 //configure express
 app.use(express.json());
-app.use(cors());
-
+app.use(cors({
+    origin:true,
+    credentials: true,
+}));
+app.use(cookieParser());
 //routing
 
-app.get('/', (req, res) => {
-    res.send('Hello World')
-});
+app.post('/signup', userController.signup);
+app.post('/login', userController.login);
+app.get('/logout', userController.logout);
+app.get('/check-auth', requireAuth, userController.checkAuth);
 
 app.get('/notes', notesController.fetchNotes);
 
